@@ -17,7 +17,8 @@
             </div>
             <div class="info">
                 {{-- <a href="#" class="d-block">{{ Auth::user()->name }}</a> --}}
-                <a href="#" class="d-block text-bold text-white">HALO, Selamat Datang</a>
+                <a href="#" class="d-block text-bold text-white">Selamat Datang,
+                    {{ auth()->user()->name }}</a>
             </div>
         </div>
 
@@ -53,7 +54,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('logout') }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         <p>
                             Logout

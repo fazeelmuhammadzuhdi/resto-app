@@ -1,5 +1,9 @@
 @extends('layouts.auth')
 
+@section('style')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
+
 @section('content')
     <div class="login-box">
         <!-- /.login-logo -->
@@ -10,7 +14,7 @@
             <div class="card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
 
-                <form action="#" method="post">
+                <form action="{{ route('login.store') }}" method="POST" id="formLogin">
                     @csrf
                     <div class="input-group mb-3">
                         <input type="email" name="email" id="email" class="form-control" placeholder="Email">
@@ -62,6 +66,46 @@
                     $('#password').attr('type', 'password');
 
                 }
+            });
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            $(document).on('submit', '#formLogin', function(e) {
+                e.preventDefault()
+
+                let dataForm = this;
+                // console.log(dataForm);
+                $.ajax({
+                    type: $('#formLogin').attr('method'),
+                    url: $('#formLogin').attr('action'),
+                    data: new FormData(dataForm),
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status == 405) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: response.error
+                            })
+                            $('#formLogin')[0].reset();
+                        } else if (response.status == 400) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: response.error
+                            })
+                            $('#formLogin')[0].reset();
+                        } else {
+                            window.location.replace('http://127.0.0.1:8000/dashboard')
+                        }
+                    }
+                });
             });
         });
     </script>
