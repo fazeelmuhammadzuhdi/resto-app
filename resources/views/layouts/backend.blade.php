@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Halaman | Dashboard @yield('title')</title>
+    <title>Halaman | @yield('title')</title>
     <!-- Google Font: Source Sans Pro -->
 
     {{-- style --}}
@@ -58,11 +58,11 @@
     <!-- ./wrapper -->
 
     {{-- script --}}
-    @stack('before-script')
+    {{-- @stack('before-script') --}}
     @include('layouts.script')
-    @stack('after-script')
+    {{-- @stack('after-script') --}}
 
-    {{-- @yield('js') --}}
+    @yield('js')
 
 </body>
 

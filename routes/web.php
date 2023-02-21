@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +27,11 @@ Route::get('403', function () {
 Route::middleware('auth')->controller(DashboardController::class)->group(function () {
     Route::get('dashboard', 'index')->name('dashboard');
 });
+
+Route::middleware('auth')->controller(UserController::class)->group(function () {
+    Route::get('user', 'index')->name('user');
+});
+
 
 Route::controller(LoginController::class)->group(function () {
     Route::get('login', 'index')->name('login.index');
