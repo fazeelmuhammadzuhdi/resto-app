@@ -3,13 +3,14 @@
 
 @section('title', 'Form User')
 
+
 @section('content')
     <div class="row">
         <div class="col-md-12 col-sm-12">
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-3">
-                        <button class="btn btn-primary" type="button">
+                        <button class="btn btn-primary" type="button" data-toggle="modal" data-target='#addModalUser'>
                             <span class="fas fa-plus-circle"></span>
                             Tambah Data
                         </button>
@@ -24,20 +25,9 @@
                                         <th>Nama</th>
                                         <th>Email</th>
                                         <th>Roles</th>
-                                        <th>Action</th>
+                                        <th width="20%">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach ($user as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $item->name }}</td>
-                                            <td>{{ $item->email }}</td>
-                                            <td>{{ $item->roles }}</td>
-                                            <td>Action</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -45,20 +35,55 @@
             </div>
         </div>
     </div>
+    @include('backend.user.addModalUser')
 @endsection
 
 @section('js')
     <script>
         $(document).ready(function() {
-            $('#tableUser').DataTable({
-                responsive: true,
-                lengthCase: true,
-                autoWidth: true,
-                paging: true,
-                searching: true,
-                ordering: true,
-                info: true
-            })
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            fetchUser()
+
+            function fetchUser() {
+                let datatable = $('#tableUser').DataTable({
+
+                    processing: true,
+                    info: true,
+                    serverSide: true,
+
+                    ajax: {
+                        url: "{{ route('user.fetch') }}",
+                        type: "get"
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex'
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'email',
+                            name: 'email'
+                        },
+                        {
+                            data: 'roles',
+                            name: 'roles'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action'
+                        }
+                    ]
+                });
+            }
+
         });
     </script>
 @endsection

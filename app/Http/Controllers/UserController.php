@@ -14,8 +14,32 @@ class UserController extends Controller
      */
     public function index()
     {
+        return view('backend.user.index');
+    }
+
+
+    public function fetchUser(Request $request)
+    {
         $user = User::all();
-        return view('backend.user.index', compact('user'));
+
+        if ($request->ajax()) {
+            return datatables()->of($user)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    return '
+                        <div class="btn-group">
+                            <button class="btn btn-warning btn-sm" data-id="' . $row['id'] . '">
+                                <span class="fas fa-edit"></span> Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm mx-2" data-id="' . $row['id'] . '">
+                                <span class="fas fa-trash-alt"></span> Hapus
+                            </button>
+                        </div>
+                    ';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     /**
