@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -28,10 +29,10 @@ class UserController extends Controller
                 ->addColumn('action', function ($row) {
                     return '
                         <div class="btn-group">
-                            <button class="btn btn-warning btn-sm" data-id="' . $row['id'] . '">
+                            <button id="btnEditUser" class="btn btn-warning btn-sm" data-id="' . $row['id'] . '">
                                 <span class="fas fa-edit"></span> Edit
                             </button>
-                            <button class="btn btn-danger btn-sm mx-2" data-id="' . $row['id'] . '">
+                            <button id="btnDeleteUser" class="btn btn-danger btn-sm mx-2" data-id="' . $row['id'] . '">
                                 <span class="fas fa-trash-alt"></span> Hapus
                             </button>
                         </div>
@@ -60,7 +61,37 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'email|required',
+            'roles' => 'required',
+            'password' => 'required|string',
+        ], [
+            'name.required' => 'Field Nama Wajib Diisi',
+            'email.email' => 'Field Email Harus Valid Contoh : fazeel@gmail.com',
+            'email.required' => 'Field Email Wajib Diisi',
+            'roles.required' => 'Field Roles Wajib Diisi',
+            'password.required' => 'Field Password Wajib Diisi',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => 400,
+                'error' => $validation->errors()->toArray(),
+            ]);
+        } else {
+            $dataUser = new User();
+            $dataUser->name = $request->name;
+            $dataUser->email = $request->email;
+            $dataUser->roles = $request->roles;
+            $dataUser->password = bcrypt($request->password);
+            $dataUser->save();
+
+            return response()->json([
+                'status' => 200,
+                'success' => "Data User Berhasil Di Simpan"
+            ]);
+        }
     }
 
     /**
@@ -80,9 +111,15 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $user = User::findOrFail($request->idUser);
+        // $user = User::findOrFail($request->get('idUser'));
+
+        return response()->json([
+            'status' => 200,
+            'user' => $user
+        ]);
     }
 
     /**
@@ -92,9 +129,43 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'email|required',
+            'roles' => 'required',
+            'password' => 'nullable',
+        ], [
+            'name.required' => 'Field Nama Wajib Diisi',
+            'email.email' => 'Field Email Harus Valid Contoh : fazeel@gmail.com',
+            'email.required' => 'Field Email Wajib Diisi',
+            'roles.required' => 'Field Roles Wajib Diisi',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => 400,
+                'error' => $validation->errors()->toArray(),
+            ]);
+        } else {
+            $dataUser = User::findOrFail($request->idUser);
+            $dataUser->name = $request->name;
+            $dataUser->email = $request->email;
+            $dataUser->roles = $request->roles;
+
+            if ($dataUser->password && $request->password == "") {
+                unset($request->password);
+            } else {
+                $dataUser->password = bcrypt($request->password);
+            }
+            $dataUser->update();
+
+            return response()->json([
+                'status' => 200,
+                'success' => "Data User Dengan Nama " . $dataUser->name . " Berhasil Di Update"
+            ]);
+        }
     }
 
     /**
@@ -103,8 +174,21 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $dataUser = User::findOrFail($request->idUser);
+
+        if ($dataUser->id == auth()->user()->id) {
+            return response()->json([
+                'status' => 400,
+                'error' => "Tidak Bisa Hapus Data, Karena User Sedang Aktif"
+            ]);
+        }
+        $dataUser->delete();
+
+        return response()->json([
+            'status' => 200,
+            'success' => "Data Dengan Nama " . $dataUser->name . " Berhasil Di Hapus"
+        ]);
     }
 }

@@ -30,7 +30,11 @@ Route::middleware('auth')->controller(DashboardController::class)->group(functio
 
 Route::middleware('auth')->controller(UserController::class)->group(function () {
     Route::get('user', 'index')->name('user');
+    Route::post('user', 'store')->name('user.store');
     Route::get('fetchUser', 'fetchUser')->name('user.fetch');
+    Route::get('user/edit', 'edit')->name('user.edit');
+    Route::post('user/edit', 'update')->name('user.update');
+    Route::post('user/destroy', 'destroy')->name('user.destroy');
 });
 
 

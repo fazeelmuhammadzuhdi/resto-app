@@ -35,55 +35,13 @@
             </div>
         </div>
     </div>
+    {{-- Add Modal User --}}
     @include('backend.user.addModalUser')
+
+    {{-- Edit Modal User --}}
+    @include('backend.user.editModalUser')
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            fetchUser()
-
-            function fetchUser() {
-                let datatable = $('#tableUser').DataTable({
-
-                    processing: true,
-                    info: true,
-                    serverSide: true,
-
-                    ajax: {
-                        url: "{{ route('user.fetch') }}",
-                        type: "get"
-                    },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex'
-                        },
-                        {
-                            data: 'name',
-                            name: 'name'
-                        },
-                        {
-                            data: 'email',
-                            name: 'email'
-                        },
-                        {
-                            data: 'roles',
-                            name: 'roles'
-                        },
-                        {
-                            data: 'action',
-                            name: 'action'
-                        }
-                    ]
-                });
-            }
-
-        });
-    </script>
+    @include('backend.user.scripts')
 @endsection
