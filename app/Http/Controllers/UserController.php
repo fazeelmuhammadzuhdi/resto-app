@@ -38,7 +38,13 @@ class UserController extends Controller
                         </div>
                     ';
                 })
-                ->rawColumns(['action'])
+                ->addColumn('checkbox', function ($row) {
+                    return '
+                         <input data-id="' . $row['id'] . '" type="checkbox" name="user_checkbox" id="user_checkbox">
+                         <label for=""></label>
+                    ';
+                })
+                ->rawColumns(['action', 'checkbox'])
                 ->make(true);
         }
     }
@@ -63,13 +69,14 @@ class UserController extends Controller
     {
         $validation = Validator::make($request->all(), [
             'name' => 'required|string',
-            'email' => 'email|required',
+            'email' => 'email|required|unique:users,email',
             'roles' => 'required',
             'password' => 'required|string',
         ], [
             'name.required' => 'Field Nama Wajib Diisi',
             'email.email' => 'Field Email Harus Valid Contoh : fazeel@gmail.com',
             'email.required' => 'Field Email Wajib Diisi',
+            'email.unique' => 'Email Sudah Ada',
             'roles.required' => 'Field Roles Wajib Diisi',
             'password.required' => 'Field Password Wajib Diisi',
         ]);
@@ -190,5 +197,18 @@ class UserController extends Controller
             'status' => 200,
             'success' => "Data Dengan Nama " . $dataUser->name . " Berhasil Di Hapus"
         ]);
+    }
+
+    public function destroySelected(Request $request)
+    {
+        $idUser = $request->idUsers;
+        $query = User::whereIn('id', $idUser)->delete();
+
+        if ($query) {
+            return response()->json([
+                'status' => 200,
+                'success' => "Data User Berhasil Di Hapus"
+            ]);
+        }
     }
 }

@@ -20,6 +20,12 @@
                      type: "get"
                  },
                  columns: [{
+                         data: 'checkbox',
+                         name: 'checkbox',
+                         orderable: false,
+                         searchable: false
+                     },
+                     {
                          data: 'DT_RowIndex',
                          name: 'DT_RowIndex'
                      },
@@ -37,9 +43,18 @@
                      },
                      {
                          data: 'action',
-                         name: 'action'
+                         name: 'action',
+                         orderable: false,
+                         searchable: false
                      }
                  ]
+             }).on('draw', function() {
+                 $('input[name="user_checkbox"]').each(function() {
+                     this.checked = false;
+                 })
+
+                 $('input[name="main_checkbox"]').prop('checked', false);
+                 $('#deleteAll').addClass('d-none');
              });
          }
 
@@ -139,7 +154,6 @@
          });
 
          //Delete Data User
-
          $(document).on('click', '#btnDeleteUser', function(e) {
              e.preventDefault();
 
@@ -179,6 +193,80 @@
                      );
                  }
              })
+         });
+
+         function toggleDeleteAllBtn() {
+             if ($('input[name="user_checkbox"]:checked').length > 0) {
+                 $('#deleteAll').text('Hapus (' + $('input[name="user_checkbox"]:checked').length + ')')
+                     .removeClass('d-none');
+             } else {
+                 $('#deleteAll').addClass('d-none');
+             }
+         }
+
+         $(document).on('click', '#main_checkbox', function() {
+             if (this.checked) {
+                 $('input[name="user_checkbox"]').each(function() {
+                     this.checked = true;
+                 });
+             } else {
+                 $('input[name="user_checkbox"]').each(function() {
+                     this.checked = false;
+                 });
+             }
+             toggleDeleteAllBtn();
+         });
+
+         $(document).on('click', '#user_checkbox', function() {
+             if ($('input[name="user_checkbox"]').length == $('input[name="user_checkbox"]:checked')
+                 .length) {
+                 $('#main_checkbox').prop('checked', true);
+             } else {
+                 $('#main_checkbox').prop('checked', false);
+             }
+             toggleDeleteAllBtn();
+         });
+
+         $(document).on('click', '#deleteAll', function(e) {
+             e.preventDefault()
+
+             let idUsers = []
+
+             $('input[name="user_checkbox"]:checked').each(function() {
+                 idUsers.push($(this).data('id'));
+             });
+
+             //  alert(idUsers);
+             if (idUsers.length > 0) {
+                 Swal.fire({
+                     title: 'Apakah Kamu Yakin?',
+                     html: "Kamu Ingin Menghapus <b>(" + idUsers.length + ")</b> Data User",
+                     icon: 'warning',
+                     showCancelButton: true,
+                     showCloseButton: true,
+                     confirmButtonColor: '#3085d6',
+                     cancelButtonColor: '#d33',
+                     cancelButtonText: 'Tidak',
+                     confirmButtonText: 'Ya, Hapus!'
+                 }).then((result) => {
+                     if (result.isConfirmed) {
+                         $.post("{{ route('user.destroySelected') }}", {
+                                 idUsers: idUsers
+                             },
+                             function(data) {
+                                 Swal.fire(
+                                         'Sukses',
+                                         data.success,
+                                         'success',
+                                     ),
+                                     $('#tableUser').DataTable().ajax.reload(null, false);
+                             },
+                             "json"
+                         );
+                     }
+                 })
+             }
+
          });
      });
  </script>

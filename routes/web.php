@@ -35,6 +35,7 @@ Route::middleware('auth')->controller(UserController::class)->group(function () 
     Route::get('user/edit', 'edit')->name('user.edit');
     Route::post('user/edit', 'update')->name('user.update');
     Route::post('user/destroy', 'destroy')->name('user.destroy');
+    Route::post('user/destroy/selected', 'destroySelected')->name('user.destroySelected');
 });
 
 
