@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
@@ -37,6 +38,18 @@ Route::middleware('auth')->controller(UserController::class)->group(function () 
     Route::post('user/destroy', 'destroy')->name('user.destroy');
     Route::post('user/destroy/selected', 'destroySelected')->name('user.destroySelected');
 });
+
+
+Route::middleware('auth')->controller(CategoryController::class)->group(function () {
+    Route::get('category', 'index')->name('category');
+    Route::post('category', 'store')->name('category.store');
+    Route::get('fetchCategory', 'fetchCategory')->name('category.fetch');
+    Route::get('category/edit', 'edit')->name('category.edit');
+    Route::post('category/edit', 'update')->name('category.update');
+    Route::post('category/destroy', 'destroy')->name('category.destroy');
+    Route::post('category/destroy/selected', 'destroySelected')->name('category.destroySelected');
+});
+
 
 
 Route::controller(LoginController::class)->group(function () {

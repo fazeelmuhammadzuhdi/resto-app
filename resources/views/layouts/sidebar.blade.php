@@ -73,6 +73,15 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('category') }}" class="nav-link {{ request()->is('category') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-caret-square-right"></i>
+                        <p>
+                            Kategori
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                </li>
 
                 <li class="nav-item">
                     <a href="{{ route('logout') }}" class="nav-link">
